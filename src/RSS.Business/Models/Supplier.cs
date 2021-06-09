@@ -11,7 +11,7 @@ namespace RSS.Business.Models
         public bool Active { get; set; }
 
         /*EF Relations*/
-        public Adress Adress { get; set; }
+        public Address Adress { get; set; }
         public IEnumerable<Product> Products { get; set; }
     }
 }
