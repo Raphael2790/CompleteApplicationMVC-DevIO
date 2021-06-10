@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RSS.Business.Interfaces;
 using RSS.CompleteApp.Data;
 using RSS.Data.Context;
+using RSS.Data.Repository;
 
 namespace RSS.CompleteApp
 {
@@ -35,6 +37,11 @@ namespace RSS.CompleteApp
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            services.AddScoped<CompleteAppDbContext>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
+            services.AddScoped<ISupplierRepository, SupplierRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
