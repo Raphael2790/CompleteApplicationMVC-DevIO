@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using RSS.CompleteApp.ViewModels;
 
 namespace RSS.CompleteApp.Data
 {
@@ -12,5 +13,7 @@ namespace RSS.CompleteApp.Data
             : base(options)
         {
         }
+        public DbSet<RSS.CompleteApp.ViewModels.ProductViewModel> ProductViewModel { get; set; }
+        public DbSet<RSS.CompleteApp.ViewModels.SupplierViewModel> SupplierViewModel { get; set; }
     }
 }
