@@ -1,6 +1,6 @@
 using System;
 
-namespace RSS.CompleteApp.Models
+namespace RSS.CompleteApp.ViewModels
 {
     public class ErrorViewModel
     {

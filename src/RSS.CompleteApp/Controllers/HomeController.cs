@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using RSS.CompleteApp.Models;
+using RSS.CompleteApp.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
