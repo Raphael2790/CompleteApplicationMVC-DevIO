@@ -24,6 +24,7 @@ namespace RSS.CompleteApp.ViewModels
         [StringLength(1000, ErrorMessage = "o campo {0} precisa ter entre {2} e {1}", MinimumLength = 2)]
         public string Description { get; set; }
 
+        [DisplayName("Imagem do produto")]
         public IFormFile UploadImage { get; set; }
 
         public string Image { get; set; }
@@ -38,6 +39,7 @@ namespace RSS.CompleteApp.ViewModels
         [DisplayName("Ativo?")]
         public bool Active { get; set; }
 
+        [DisplayName("Fornecedor")]
         public SupplierViewModel Supplier { get; set; }
         public IEnumerable<SupplierViewModel> Suppliers { get; set; } 
     }

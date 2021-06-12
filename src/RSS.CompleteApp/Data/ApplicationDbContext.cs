@@ -13,7 +13,5 @@ namespace RSS.CompleteApp.Data
             : base(options)
         {
         }
-        public DbSet<RSS.CompleteApp.ViewModels.ProductViewModel> ProductViewModel { get; set; }
-        public DbSet<RSS.CompleteApp.ViewModels.SupplierViewModel> SupplierViewModel { get; set; }
     }
 }

@@ -44,7 +44,7 @@ namespace RSS.CompleteApp.Controllers
         public async Task<IActionResult> Create()
         {
             var productviewModel = await PopulateSuppliersList(new ProductViewModel());
-            return View();
+            return View(productviewModel);
         }
 
         [ValidateAntiForgeryToken]
