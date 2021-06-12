@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RSS.Business.Interfaces;
 using RSS.CompleteApp.Data;
+using RSS.CompleteApp.Extensions;
 using RSS.Data.Context;
 using RSS.Data.Repository;
 
@@ -37,13 +39,14 @@ namespace RSS.CompleteApp
 
             services.AddAutoMapper(typeof(Startup));
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(options => MvcOptionsConfig.MessageProviderConfiguration(options));
             services.AddRazorPages();
 
             services.AddScoped<CompleteAppDbContext>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<ISupplierRepository, SupplierRepository>();
+            services.AddSingleton<IValidationAttributeAdapterProvider, CurrencyValidationAttributeProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,6 +70,8 @@ namespace RSS.CompleteApp
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.ConfigureLocalization();
 
             app.UseEndpoints(endpoints =>
             {

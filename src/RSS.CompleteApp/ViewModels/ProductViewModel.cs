@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using RSS.CompleteApp.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,6 +30,8 @@ namespace RSS.CompleteApp.ViewModels
 
         public string Image { get; set; }
 
+        [Currency]
+        [DisplayName("Preço")]
         [Required(ErrorMessage = "O campo {0} é obrigatório")]
         public decimal Price { get; set; }
 

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RSS.Business.Interfaces;
 using RSS.Business.Models;
@@ -47,12 +49,19 @@ namespace RSS.CompleteApp.Controllers
             return View(productviewModel);
         }
 
-        [ValidateAntiForgeryToken]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductViewModel productViewModel)
         {
             productViewModel = await PopulateSuppliersList(productViewModel);
             if (!ModelState.IsValid) return View(productViewModel);
+
+            var imgPrefix = Guid.NewGuid() + "_";
+
+            if (!await UploadFile(productViewModel.UploadImage, imgPrefix))
+                return View(productViewModel);
+
+            productViewModel.Image = imgPrefix + productViewModel.UploadImage.FileName;
 
             await _productRepository.Add(_mapper.Map<Product>(productViewModel));
            
@@ -75,9 +84,30 @@ namespace RSS.CompleteApp.Controllers
         {
             if (id != productViewModel.Id) return NotFound();
 
+            var updateProduct = await GetProduct(id);
+            productViewModel.Supplier = updateProduct.Supplier;
+            productViewModel.Image = updateProduct.Image;
             if (!ModelState.IsValid) return View(productViewModel);
 
-            await _productRepository.Update(_mapper.Map<Product>(productViewModel));
+            if(productViewModel.UploadImage != null)
+            {
+                var imgPrefix = Guid.NewGuid() + "_";
+
+                if(!await UploadFile(productViewModel.UploadImage, imgPrefix))
+                {
+                    return View(productViewModel);
+                }
+                updateProduct.Image = imgPrefix + productViewModel.UploadImage.FileName;
+            }
+
+            //Usado o objeto rastreado pelo entity na modificação
+            //Controlando também a troca das informações
+            updateProduct.Name = productViewModel.Name;
+            updateProduct.Description = productViewModel.Description;
+            updateProduct.Price = productViewModel.Price;
+            updateProduct.Active = productViewModel.Active;
+
+            await _productRepository.Update(_mapper.Map<Product>(updateProduct));
            
             return RedirectToAction(nameof(Index));
         }
@@ -123,6 +153,27 @@ namespace RSS.CompleteApp.Controllers
         {
             product.Suppliers = _mapper.Map<IEnumerable<SupplierViewModel>>(await _supplierRepository.GetAll());
             return product;
+        }
+
+        private async Task<bool> UploadFile(IFormFile file, string imgPrefix)
+        {
+            if (file.Length <= 0) return false;
+
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", imgPrefix + file.FileName);
+
+            //verifica se o arquivo já existe
+            if (System.IO.File.Exists(path))
+            {
+                ModelState.AddModelError(string.Empty, "Já existe um arquivo com este nome!");
+                return false;
+            }
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return true;
         }
     }
 }
