@@ -15,7 +15,7 @@ namespace RSS.Data.Repository
 
         public async Task<Supplier> GetSupplierAddress(Guid id)
         {
-            return await _db.Suppliers.Include(s => s.Adress).FirstOrDefaultAsync(s => s.Id == id);
+            return await _db.Suppliers.AsNoTracking().Include(s => s.Adress).FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public async Task<Supplier> GetSupplierProductsAddress(Guid id)

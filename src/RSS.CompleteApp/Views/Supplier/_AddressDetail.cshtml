@@ -1,0 +1,70 @@
+﻿@model RSS.CompleteApp.ViewModels.SupplierViewModel
+
+<div style="padding-top: 20px">
+    <div>
+        <hr />
+        <h4>Endereço</h4>
+    </div>
+
+    @if (Model != null)
+    {
+        <table class="table table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Address.Street)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Address.Number)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Address.Complement)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Address.ZipCode)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Address.Neighborhood)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Address.City)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Address.State)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem.Address.Street)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem.Address.Number)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem.Address.Complement)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem.Address.ZipCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem.Address.Neighborhood)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem.Address.City)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem.Address.State)
+                    </td>
+                    <td>
+                        <a class="btn btn-info"><span title="Editar" class="fa fa-pencil-alt"></span></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    }
+
+
+</div>

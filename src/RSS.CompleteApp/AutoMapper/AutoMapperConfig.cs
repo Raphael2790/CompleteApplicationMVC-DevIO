@@ -8,7 +8,19 @@ namespace RSS.CompleteApp.AutoMapper
     {
         public AutoMapperConfig()
         {
-            CreateMap<Supplier, SupplierViewModel>().ReverseMap();
+            //Verificando se o objeto aninhado é nulo, caso não seja mapeia
+            AllowNullCollections = true;
+            CreateMap<Supplier, SupplierViewModel>().ForMember(s => s.Address, opt => 
+            { 
+                opt.Condition(src => src.Adress != null);
+                opt.MapFrom(src => src.Adress);
+            })
+            .ForMember( s=> s.Products, opt => 
+            {
+                opt.Condition(src => src.Products != null);
+                opt.MapFrom(src => src.Products);
+            })
+            .ReverseMap();
             CreateMap<Address, AddressViewModel>().ReverseMap();
             CreateMap<Product, ProductViewModel>().ReverseMap();
         }
