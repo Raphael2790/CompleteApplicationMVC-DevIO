@@ -8,19 +8,36 @@ namespace RSS.Business.Services
 {
     public class ProductService : BaseService, IProductService
     {
+        private readonly IProductRepository _productRepository;
+
+        public ProductService(IProductRepository productRepository,
+                                INotifiable notifiable) : base(notifiable)
+        {
+            _productRepository = productRepository;
+        }
+
         public async Task AddProduct(Product product)
         {
             if (!ExecuteValidation(new ProductValidation(), product)) return;
+
+            await _productRepository.Add(product);
         }
 
         public async Task RemoveProduct(Guid id)
         {
-            throw new NotImplementedException();
+            await _productRepository.Remove(id);
         }
 
-        public async Task UpdateProdutc(Product product)
+        public async Task UpdateProduct(Product product)
         {
             if (!ExecuteValidation(new ProductValidation(), product)) return;
+
+            await _productRepository.Update(product);
+        }
+
+        public void Dispose()
+        {
+            _productRepository?.Dispose();
         }
     }
 }

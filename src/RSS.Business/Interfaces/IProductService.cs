@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 
 namespace RSS.Business.Interfaces
 {
-    public interface IProductService
+    public interface IProductService : IDisposable
     {
         Task AddProduct(Product product);
-        Task UpdateProdutc(Product product);
+        Task UpdateProduct(Product product);
         Task RemoveProduct(Guid id);
     }
 }

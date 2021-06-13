@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.DataAnnotations;
 using Microsoft.Extensions.DependencyInjection;
 using RSS.Business.Interfaces;
+using RSS.Business.Notifications;
+using RSS.Business.Services;
 using RSS.CompleteApp.Extensions;
 using RSS.Data.Context;
 using RSS.Data.Repository;
@@ -20,6 +22,11 @@ namespace RSS.CompleteApp.Configurations
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<ISupplierRepository, SupplierRepository>();
             services.AddSingleton<IValidationAttributeAdapterProvider, CurrencyValidationAttributeProvider>();
+
+            services.AddScoped<INotifiable, Notifiable>();
+            services.AddScoped<ISupplierService, SupplierService>();
+            services.AddScoped<IProductService, ProductService>();
+            
             return services;
         }
     }

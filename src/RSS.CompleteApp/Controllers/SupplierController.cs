@@ -11,14 +11,18 @@ namespace RSS.CompleteApp.Controllers
 {
     public class SupplierController : BaseController
     {
+        //Deixamos o repositório injetado para agilizar buscas sem validações
         private readonly ISupplierRepository _supplierRepository;
-        private readonly IAddressRepository _addressRepository;
+        private readonly ISupplierService _supplierService;
         private readonly IMapper _mapper;
 
-        public SupplierController(ISupplierRepository supplierRepository, IAddressRepository addressRepository, IMapper mapper)
+        public SupplierController(ISupplierRepository supplierRepository, 
+                                    ISupplierService supplierService, 
+                                    IMapper mapper,
+                                    INotifiable notifiable) : base(notifiable)
         {
             _supplierRepository = supplierRepository;
-            _addressRepository = addressRepository;
+            _supplierService = supplierService;
             _mapper = mapper;
         }
 
@@ -55,7 +59,11 @@ namespace RSS.CompleteApp.Controllers
 
             var supplier = _mapper.Map<Supplier>(supplierViewModel);
 
-            await _supplierRepository.Add(supplier);
+            await _supplierService.AddSupplier(supplier);
+
+            if (!ValidOperation()) return View(supplierViewModel);
+
+            TempData["Sucesso"] = "Fornecedor cadastrado com êxito";
 
             return RedirectToAction(nameof(Index));
         }
@@ -81,7 +89,11 @@ namespace RSS.CompleteApp.Controllers
             if(!ModelState.IsValid) return View(supplierViewModel);
 
             var supplier = _mapper.Map<Supplier>(supplierViewModel);
-            await _supplierRepository.Update(supplier);
+            await _supplierService.UpdateSupplier(supplier);
+
+            if (!ValidOperation()) return View(await GetSupplierProductsAddress(id));
+
+            TempData["Sucesso"] = "Cadastro atualizado com êxito";
 
             return RedirectToAction(nameof(Index));
         }
@@ -107,7 +119,11 @@ namespace RSS.CompleteApp.Controllers
 
             if (supplierViewModel == null) return NotFound();
 
-            await _supplierRepository.Remove(id);
+            await _supplierService.RemoveSupplier(id);
+
+            if (!ValidOperation()) return View(supplierViewModel);
+
+            TempData["Sucesso"] = "Fornecedor exclui com sucesso!";
 
             return RedirectToAction(nameof(Index));
         }
@@ -140,7 +156,9 @@ namespace RSS.CompleteApp.Controllers
 
             if (!ModelState.IsValid) return PartialView("_UpdateAddress", supplierViewModel);
 
-            await _addressRepository.Update(_mapper.Map<Address>(supplierViewModel.Address));
+            await _supplierService.UpdateSupplierAddress(_mapper.Map<Address>(supplierViewModel.Address));
+
+            if (!ValidOperation()) return PartialView("_UpdateAddress", supplierViewModel);
 
             var url = Url.Action("GetAddress", "Supplier", new { id = supplierViewModel.Address.SupplierId });
 

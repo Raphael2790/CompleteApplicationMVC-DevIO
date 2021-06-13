@@ -15,14 +15,18 @@ namespace RSS.CompleteApp.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly ISupplierRepository _supplierRepository;
+        private readonly IProductService _productService;
         private readonly IMapper _mapper;
 
         public ProductController(IProductRepository productRepository, 
-                                ISupplierRepository supplierRepository, 
-                                IMapper mapper)
+                                    ISupplierRepository supplierRepository, 
+                                    IProductService productService, 
+                                    IMapper mapper,
+                                    INotifiable notifiable) : base (notifiable)
         {
             _productRepository = productRepository;
             _supplierRepository = supplierRepository;
+            _productService = productService;
             _mapper = mapper;
         }
 
@@ -67,7 +71,11 @@ namespace RSS.CompleteApp.Controllers
 
             productViewModel.Image = imgPrefix + productViewModel.UploadImage.FileName;
 
-            await _productRepository.Add(_mapper.Map<Product>(productViewModel));
+            await _productService.AddProduct(_mapper.Map<Product>(productViewModel));
+
+            if (!ValidOperation()) return View(productViewModel);
+
+            TempData["Sucesso"] = "Produto criado com sucesso!";
            
             return RedirectToAction(nameof(Index));
         }
@@ -113,7 +121,11 @@ namespace RSS.CompleteApp.Controllers
             updateProduct.Price = productViewModel.Price;
             updateProduct.Active = productViewModel.Active;
 
-            await _productRepository.Update(_mapper.Map<Product>(updateProduct));
+            await _productService.UpdateProduct(_mapper.Map<Product>(updateProduct));
+
+            if (!ValidOperation()) return View(productViewModel);
+
+            TempData["Sucesso"] = "Produto atualizado com sucesso!";
            
             return RedirectToAction(nameof(Index));
         }
@@ -144,7 +156,11 @@ namespace RSS.CompleteApp.Controllers
                 return NotFound();
             }
 
-            await _productRepository.Remove(id);
+            await _productService.RemoveProduct(id);
+
+            if (!ValidOperation()) return View(productViewModel);
+
+            TempData["Sucesso"] = "Produto excluído com sucesso!";
 
             return RedirectToAction(nameof(Index));
         }
