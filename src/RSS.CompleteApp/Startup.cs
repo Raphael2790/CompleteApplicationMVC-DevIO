@@ -1,52 +1,50 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using RSS.Business.Interfaces;
-using RSS.CompleteApp.Data;
+using RSS.CompleteApp.Configurations;
 using RSS.CompleteApp.Extensions;
 using RSS.Data.Context;
-using RSS.Data.Repository;
 
 namespace RSS.CompleteApp
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        public Startup(IHostEnvironment hostEnvironment)
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(hostEnvironment.ContentRootPath)
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{hostEnvironment.EnvironmentName}.json", true, true)
+                .AddEnvironmentVariables();
+
+            //Adiciona dados de produção na pasta do usuário local caso desejar acessar produção localmente
+            if (hostEnvironment.IsProduction())
+            {
+                builder.AddUserSecrets<Startup>();
+            }
+
+            Configuration = builder.Build();
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-
             services.AddDbContext<CompleteAppDbContext>(options =>
                options.UseSqlServer(
                    Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddIdentityConfiguration(Configuration);
 
             services.AddAutoMapper(typeof(Startup));
 
             services.AddControllersWithViews(options => MvcOptionsConfig.MessageProviderConfiguration(options));
             services.AddRazorPages();
 
-            services.AddScoped<CompleteAppDbContext>();
-            services.AddScoped<IProductRepository, ProductRepository>();
-            services.AddScoped<IAddressRepository, AddressRepository>();
-            services.AddScoped<ISupplierRepository, SupplierRepository>();
-            services.AddSingleton<IValidationAttributeAdapterProvider, CurrencyValidationAttributeProvider>();
+            services.ResolveDependencies();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,7 +69,7 @@ namespace RSS.CompleteApp
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.ConfigureLocalization();
+            app.UseLocalizationConfiguration();
 
             app.UseEndpoints(endpoints =>
             {

@@ -7,7 +7,7 @@ namespace RSS.CompleteApp.Extensions
 {
     public static class LocalizationExtension
     {
-        public static IApplicationBuilder ConfigureLocalization(this IApplicationBuilder application)
+        public static IApplicationBuilder UseLocalizationConfiguration(this IApplicationBuilder application)
         {
             var defaultCulture = new CultureInfo("pt-BR");
 
