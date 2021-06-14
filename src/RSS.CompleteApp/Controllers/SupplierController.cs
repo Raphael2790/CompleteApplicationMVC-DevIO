@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RSS.Business.Interfaces;
 using RSS.Business.Models;
+using RSS.CompleteApp.Extensions;
 using RSS.CompleteApp.ViewModels;
 
 namespace RSS.CompleteApp.Controllers
 {
+    [Authorize]
     public class SupplierController : BaseController
     {
         //Deixamos o repositório injetado para agilizar buscas sem validações
@@ -26,12 +29,14 @@ namespace RSS.CompleteApp.Controllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         [Route("lista-de-fornecedores")]
         public async Task<IActionResult> Index()
         {
             return View(_mapper.Map<IEnumerable<SupplierViewModel>>(await _supplierRepository.GetAll()));
         }
 
+        [AllowAnonymous]
         [Route("dados-do-fornecedor/{id:guid}")]
         public async Task<IActionResult> Details(Guid id)
         {
@@ -44,12 +49,14 @@ namespace RSS.CompleteApp.Controllers
             return View(supplierViewModel);
         }
 
+        [ClaimsAuthorize("Supplier", "Add")]
         [Route("novo-fornecedor")]
         public IActionResult Create()
         {
             return View();
         }
 
+        [ClaimsAuthorize("Supplier", "Add")]
         [Route("novo-fornecedor")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -68,6 +75,7 @@ namespace RSS.CompleteApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [ClaimsAuthorize("Supplier", "Edit")]
         [Route("editar-cadastro-fornecedor/{id:guid}")]
         public async Task<IActionResult> Edit(Guid id)
         {
@@ -79,6 +87,7 @@ namespace RSS.CompleteApp.Controllers
             return View(supplierViewModel);
         }
 
+        [ClaimsAuthorize("Supplier", "Edit")]
         [HttpPost]
         [Route("editar-cadastro-fornecedor/{id:guid}")]
         [ValidateAntiForgeryToken]
@@ -98,6 +107,7 @@ namespace RSS.CompleteApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [ClaimsAuthorize("Supplier", "Remove")]
         [Route("excluir-cadastro-fornecedor/{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -110,6 +120,7 @@ namespace RSS.CompleteApp.Controllers
             return View(supplierViewModel);
         }
 
+        [ClaimsAuthorize("Supplier", "Remove")]
         [HttpPost, ActionName("Delete")]
         [Route("excluir-cadastro-fornecedor/{id:guid}")]
         [ValidateAntiForgeryToken]
@@ -128,6 +139,7 @@ namespace RSS.CompleteApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [AllowAnonymous]
         [Route("endereco-fornecedor/{id:guid}")]
         public async Task<IActionResult> GetAddress(Guid id)
         {
@@ -136,6 +148,7 @@ namespace RSS.CompleteApp.Controllers
             return PartialView("_AddressDetail", supplier);
         }
 
+        [ClaimsAuthorize("Supplier", "Edit")]
         [Route("atualizar-endereco-fornecedor/{id:guid}")]
         public async Task<IActionResult> UpdateAddress(Guid id)
         {
@@ -146,6 +159,7 @@ namespace RSS.CompleteApp.Controllers
             return PartialView("_UpdateAddress", new SupplierViewModel { Address = supplier.Address });
         }
 
+        [ClaimsAuthorize("Supplier", "Edit")]
         [HttpPost]
         [Route("atualizar-endereco-fornecedor/{id:guid}")]
         [ValidateAntiForgeryToken]

@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RSS.Business.Interfaces;
 using RSS.Business.Models;
+using RSS.CompleteApp.Extensions;
 using RSS.CompleteApp.ViewModels;
 
 namespace RSS.CompleteApp.Controllers
 {
+    [Authorize]
     public class ProductController : BaseController
     {
         private readonly IProductRepository _productRepository;
@@ -30,12 +33,14 @@ namespace RSS.CompleteApp.Controllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         [Route("lista-de-produtos")]
         public async Task<IActionResult> Index()
         {
             return View(_mapper.Map<IEnumerable<ProductViewModel>>(await _productRepository.GetProductsSuppliers()));
         }
 
+        [AllowAnonymous]
         [Route("detalhes-do-produto/{id:guid}")]
         public async Task<IActionResult> Details(Guid id)
         {
@@ -49,6 +54,7 @@ namespace RSS.CompleteApp.Controllers
             return View(productViewModel);
         }
 
+        [ClaimsAuthorize("Product", "Add")]
         [Route("novo-produto")]
         public async Task<IActionResult> Create()
         {
@@ -56,6 +62,7 @@ namespace RSS.CompleteApp.Controllers
             return View(productviewModel);
         }
 
+        [ClaimsAuthorize("Product", "Add")]
         [HttpPost]
         [Route("novo-produto")]
         [ValidateAntiForgeryToken]
@@ -80,6 +87,7 @@ namespace RSS.CompleteApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [ClaimsAuthorize("Product", "Edit")]
         [Route("editar-produto/{id:guid}")]
         public async Task<IActionResult> Edit(Guid id)
         {
@@ -91,6 +99,7 @@ namespace RSS.CompleteApp.Controllers
             return View(productViewModel);
         }
 
+        [ClaimsAuthorize("Product", "Edit")]
         [HttpPost]
         [Route("editar-produto/{id:guid}")]
         [ValidateAntiForgeryToken]
@@ -130,6 +139,7 @@ namespace RSS.CompleteApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [ClaimsAuthorize("Product", "Remove")]
         [Route("excluir-produto/{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -143,6 +153,7 @@ namespace RSS.CompleteApp.Controllers
             return View(productViewModel);
         }
 
+        [ClaimsAuthorize("Product", "Remove")]
         [HttpPost, ActionName("Delete")]
         [Route("excluir-produto/{id:guid}")]
         [ValidateAntiForgeryToken]
