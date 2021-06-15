@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using KissLog;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RSS.Business.Interfaces;
@@ -18,11 +19,13 @@ namespace RSS.CompleteApp.Controllers
         private readonly ISupplierRepository _supplierRepository;
         private readonly ISupplierService _supplierService;
         private readonly IMapper _mapper;
+        private readonly ILogger _logger;
 
         public SupplierController(ISupplierRepository supplierRepository, 
                                     ISupplierService supplierService, 
                                     IMapper mapper,
-                                    INotifiable notifiable) : base(notifiable)
+                                    INotifiable notifiable,
+                                    ILogger logger) : base(notifiable, logger)
         {
             _supplierRepository = supplierRepository;
             _supplierService = supplierService;
@@ -59,7 +62,6 @@ namespace RSS.CompleteApp.Controllers
         [ClaimsAuthorize("Supplier", "Add")]
         [Route("novo-fornecedor")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SupplierViewModel supplierViewModel)
         {
             if (!ModelState.IsValid) return View(supplierViewModel);
@@ -90,7 +92,6 @@ namespace RSS.CompleteApp.Controllers
         [ClaimsAuthorize("Supplier", "Edit")]
         [HttpPost]
         [Route("editar-cadastro-fornecedor/{id:guid}")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, SupplierViewModel supplierViewModel)
         {
             if (id != supplierViewModel.Id) return NotFound();
@@ -123,7 +124,6 @@ namespace RSS.CompleteApp.Controllers
         [ClaimsAuthorize("Supplier", "Remove")]
         [HttpPost, ActionName("Delete")]
         [Route("excluir-cadastro-fornecedor/{id:guid}")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var supplierViewModel = await GetSupplierAddress(id);
@@ -162,7 +162,6 @@ namespace RSS.CompleteApp.Controllers
         [ClaimsAuthorize("Supplier", "Edit")]
         [HttpPost]
         [Route("atualizar-endereco-fornecedor/{id:guid}")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateAddress(SupplierViewModel supplierViewModel)
         {
             ModelState.Remove("Name");

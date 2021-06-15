@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using KissLog;
+using Microsoft.AspNetCore.Mvc;
 using RSS.Business.Interfaces;
 using RSS.CompleteApp.ViewModels;
 
@@ -7,10 +7,12 @@ namespace RSS.CompleteApp.Controllers
 {
     public class HomeController : BaseController
     {
-        private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger,
-                                INotifiable notifiable) : base(notifiable)
+        private readonly ILogger _logger;
+
+        public HomeController(ILogger logger,
+                                INotifiable notifiable
+                                ) : base(notifiable, logger)
         {
             _logger = logger;
         }

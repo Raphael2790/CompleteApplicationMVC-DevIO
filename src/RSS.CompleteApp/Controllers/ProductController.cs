@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using AutoMapper;
+using KissLog;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,12 +21,14 @@ namespace RSS.CompleteApp.Controllers
         private readonly ISupplierRepository _supplierRepository;
         private readonly IProductService _productService;
         private readonly IMapper _mapper;
+        private readonly ILogger _logger;
 
         public ProductController(IProductRepository productRepository, 
                                     ISupplierRepository supplierRepository, 
                                     IProductService productService, 
                                     IMapper mapper,
-                                    INotifiable notifiable) : base (notifiable)
+                                    INotifiable notifiable,
+                                    ILogger logger) : base (notifiable, logger)
         {
             _productRepository = productRepository;
             _supplierRepository = supplierRepository;
@@ -65,7 +68,6 @@ namespace RSS.CompleteApp.Controllers
         [ClaimsAuthorize("Product", "Add")]
         [HttpPost]
         [Route("novo-produto")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductViewModel productViewModel)
         {
             productViewModel = await PopulateSuppliersList(productViewModel);
@@ -102,7 +104,6 @@ namespace RSS.CompleteApp.Controllers
         [ClaimsAuthorize("Product", "Edit")]
         [HttpPost]
         [Route("editar-produto/{id:guid}")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, ProductViewModel productViewModel)
         {
             if (id != productViewModel.Id) return NotFound();
@@ -156,7 +157,6 @@ namespace RSS.CompleteApp.Controllers
         [ClaimsAuthorize("Product", "Remove")]
         [HttpPost, ActionName("Delete")]
         [Route("excluir-produto/{id:guid}")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             //verificar caso o produto já tenha sido deletado entre o intervalo da visualização e da confirmação

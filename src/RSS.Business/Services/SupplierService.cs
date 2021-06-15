@@ -1,4 +1,5 @@
-﻿using RSS.Business.Interfaces;
+﻿using KissLog;
+using RSS.Business.Interfaces;
 using RSS.Business.Models;
 using RSS.Business.Models.Validations;
 using System;
@@ -11,10 +12,12 @@ namespace RSS.Business.Services
     {
         private readonly ISupplierRepository _supplierRepository;
         private readonly IAddressRepository _addressRepository;
+        private readonly ILogger _logger;
 
         public SupplierService(ISupplierRepository supplierRepository, 
                                 IAddressRepository addressRepository,
-                                INotifiable notifiable) : base(notifiable)
+                                INotifiable notifiable,
+                                ILogger logger) : base(notifiable, logger)
         {
             _supplierRepository = supplierRepository;
             _addressRepository = addressRepository;
@@ -22,47 +25,79 @@ namespace RSS.Business.Services
 
         public async Task AddSupplier(Supplier supplier)
         {
-            if (!ExecuteValidation(new SupplierValidation(), supplier)
-                || !ExecuteValidation(new AddressValidation(), supplier.Adress)) return;
-
-            if(_supplierRepository.Find(s => s.IdentificationDocument == supplier.IdentificationDocument).Result.Any())
+            try
             {
-                Notify("Já existe um fornecedor com este documento informado");
-                return;
-            }
+                if (!ExecuteValidation(new SupplierValidation(), supplier)
+                        || !ExecuteValidation(new AddressValidation(), supplier.Adress)) return;
 
-            await _supplierRepository.Add(supplier);
+                if (_supplierRepository.Find(s => s.IdentificationDocument == supplier.IdentificationDocument).Result.Any())
+                {
+                    Notify("Já existe um fornecedor com este documento informado");
+                    return;
+                }
+
+                await _supplierRepository.Add(supplier);
+            }
+            catch (Exception ex)
+            {
+
+               ExecuteLoggingError(ex.Message, nameof(SupplierService));
+            }
         }
 
         public async Task RemoveSupplier(Guid id)
         {
-           if(_supplierRepository.GetSupplierProductsAddress(id).Result.Products.Any(p => p.Active))
+            try
             {
-                Notify("O fornecedor possui produtos cadastrados ativos!");
-                return;
-            }
+                if (_supplierRepository.GetSupplierProductsAddress(id).Result.Products.Any(p => p.Active))
+                {
+                    Notify("O fornecedor possui produtos cadastrados ativos!");
+                    return;
+                }
 
-            await _supplierRepository.Remove(id);
+                await _supplierRepository.Remove(id);
+            }
+            catch (Exception ex)
+            {
+
+                ExecuteLoggingError(ex.Message, nameof(SupplierService));
+            }
         }
 
         public async Task UpdateSupplier(Supplier supplier)
         {
-            if (!ExecuteValidation(new SupplierValidation(), supplier)) return;
-
-            if(_supplierRepository.Find(s => s.IdentificationDocument == supplier.IdentificationDocument && s.Id != supplier.Id).Result.Any())
+            try
             {
-                Notify("Já existe um fornecedor com documento informado");
-                return;
-            }
+                if (!ExecuteValidation(new SupplierValidation(), supplier)) return;
 
-            await _supplierRepository.Update(supplier);
+                if (_supplierRepository.Find(s => s.IdentificationDocument == supplier.IdentificationDocument && s.Id != supplier.Id).Result.Any())
+                {
+                    Notify("Já existe um fornecedor com documento informado");
+                    return;
+                }
+
+                await _supplierRepository.Update(supplier);
+            }
+            catch (Exception ex)
+            {
+
+                ExecuteLoggingError(ex.Message, nameof(SupplierService));
+            }
         }
 
         public async Task UpdateSupplierAddress(Address address)
         {
-            if (!ExecuteValidation(new AddressValidation(), address)) return;
+            try
+            {
+                if (!ExecuteValidation(new AddressValidation(), address)) return;
 
-            await _addressRepository.Update(address);
+                await _addressRepository.Update(address);
+            }
+            catch (Exception ex)
+            {
+
+                ExecuteLoggingError(ex.Message, nameof(SupplierService));
+            }
         }
 
         public void Dispose()

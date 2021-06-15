@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using KissLog;
 using RSS.Business.Interfaces;
 using RSS.Business.Models;
 using RSS.Business.Notifications;
@@ -9,10 +10,12 @@ namespace RSS.Business.Services
     public abstract class BaseService
     {
         private readonly INotifiable _notifiable;
+        private readonly ILogger _logger;
 
-        protected BaseService(INotifiable notifiable)
+        protected BaseService(INotifiable notifiable, ILogger logger)
         {
             _notifiable = notifiable;
+            _logger = logger;
         }
 
         protected void Notify(ValidationResult validationResult)
@@ -34,6 +37,11 @@ namespace RSS.Business.Services
             if (validator.IsValid) return true;
             Notify(validator);
             return false;
+        }
+
+        protected void ExecuteLoggingError(string errorMessage, string memberName)
+        {
+            _logger.Error(errorMessage, memberName);
         }
     }
 }

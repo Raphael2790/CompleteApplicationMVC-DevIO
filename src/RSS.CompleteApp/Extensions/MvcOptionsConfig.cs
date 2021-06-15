@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RSS.CompleteApp.Extensions.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,10 @@ namespace RSS.CompleteApp.Extensions
             options.ModelBindingMessageProvider.SetValueIsInvalidAccessor((x) => "O valor preenchido é inválido para esse campo");
             options.ModelBindingMessageProvider.SetValueMustBeANumberAccessor((x) => "o campo deve ser numérico");
             options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(x => "Este campo precisa ser preenchido");
+
+            //Habilitando de forma global a validação do AntiForgeryToken
+            options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            options.Filters.Add(typeof(LogAccessFilter));
         }
     }
 }

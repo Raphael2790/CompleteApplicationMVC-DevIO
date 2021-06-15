@@ -1,3 +1,5 @@
+using AspNetCoreIdentity.Config;
+using KissLog.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -69,6 +71,10 @@ namespace RSS.CompleteApp
             app.UseAuthorization();
 
             app.UseLocalizationConfiguration();
+
+            app.UseKissLogMiddleware(options => {
+                LogConfig.ConfigureKissLog(options, Configuration);
+            });
 
             app.UseEndpoints(endpoints =>
             {
